@@ -1,0 +1,78 @@
+---
+title: "Part1_Statical_Inference"
+author: "carlos rios"
+date: "Wednesday, September 17, 2014"
+output: pdf_document
+---
+
+## Synopsis
+In this work I simulate the exponential distribution and then I investigate the distribution of average of 40 exponentials with parameter lambda = 0.2 
+
+## Libraries
+To carry out this work I used the following libraries.
+
+```{r warning=FALSE,message=FALSE}
+library("ggplot2")
+```
+
+## Simulation
+To simulation the exponencial distribution, I take lambda = 0.2 with mean = 1/lambda and standar-deviation = 1/lambda, then I do thousand or so simulated averages of 40 exponentials.
+
+```{r}
+lambda<-0.2
+popultaionMean<-1/lambda
+populationSd<-1/lambda
+popupationVar<-1/((lambda)^2)
+nosim<-1000
+n<-40
+sampleMean<-data.frame(x=apply(matrix(rexp(nosim * n,lambda), nosim), 1, mean))
+
+```
+
+### Show where the distribution is centered at and compare it to the theoretical center of the distribution.
+
+
+```{r}
+mean(sampleMean$x)
+popultaionMean
+```
+
+
+### Show how variable it is and compare it to the theoretical variance of the distribution.
+```{r}
+var(sampleMean$x)
+popupationVar/n
+```
+
+
+### Show that the distribution is approximately normal.
+
+In order to show how the distribution is approximately normal, I do a histogram with the distribution of averages and then I fit it with a normal distribution.
+
+```{r}
+g<-ggplot(sampleMean, aes(x = x))
+g<- g + geom_histogram(aes(y = ..density..),binwidth=0.1, position = "stack")  
+g<- g + stat_function(fun = dnorm,size=2,colour = "gray",
+                      arg = list(mean = popultaionMean,
+                                 sd=(sqrt(popupationVar)/sqrt(n)) ))
+g<- g +  labs(title="Distribution ",x="")
+g
+
+```
+
+
+### Evaluate the coverage of the confidence interval for 1/lambda: .
+
+```{r}
+(mean(sampleMean$x) + c(-1, 1) * qnorm(0.975) * sd(sampleMean$x)/sqrt(n))
+
+```
+
+
+
+## Appendix
+
+This work was made with the following environment.
+```{r}
+sessionInfo()
+```
